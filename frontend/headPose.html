@@ -1,0 +1,35 @@
+<!-- Temp files for testing -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Head Pose Tracking</title>
+    <style>
+        #head-pose-container {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 16px;
+            border-radius: 5px;
+            z-index: 100;
+        }
+        #preview {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+    </style>
+</head>
+<body>
+    <video id="preview"></video>
+    <div id="head-pose-container"></div>
+    <script type="module" src="./src/headPose.js"></script>
+</body>
+</html>
