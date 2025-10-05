@@ -5,9 +5,34 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>codename-medusa</title>
-    <style>body { padding: 0; margin: 0; }</style>
+    <style>
+      body {
+        padding: 0;
+        margin: 0;
+      }
+      #pose-data-container {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        padding: 10px;
+        background-color: rgba(0, 0, 0, 0.6);
+        color: white;
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 16px;
+        border-radius: 5px;
+        z-index: 100;
+      }
+    </style>
   </head>
   <body>
     <script type="module" src="/src/main.js"></script>
+    <script type="module" src="/src/facemesh.js"></script>
+    <div id="pose-data-container"></div>
+    <div style="display: none">
+      <div id="canvas-container">
+        <video id="video" autoplay></video>
+        <canvas id="canvas"></canvas>
+      </div>
+    </div>
   </body>
 </html>

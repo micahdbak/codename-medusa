@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import fragShader from './shader.frag?raw';
 
+import { smoothedHeadPose } from './facemesh.js';
+
 // 10x10 map
 const map = [
   1,1,1,1,1,1,1,1,1,1,
@@ -75,15 +77,16 @@ function animate() {
     window.innerWidth,
     window.innerHeight
   );
-  // material.uniforms.uCamPos.value.set(
-  //   5.0 - Math.cos(rads),
-  //   5.0 + Math.sin(rads)
-  // );
-  material.uniforms.uCamDir.value.set(
-    Math.cos(rads),
-    -Math.sin(rads)
+  let theta = rads - smoothedHeadPose.x;
+  material.uniforms.uCamPos.value.set(
+    5.0 + (Math.cos(theta) * smoothedHeadPose.z),
+    5.0 - (Math.sin(theta) * smoothedHeadPose.z)
   );
-  rads += 0.01;
+  material.uniforms.uCamDir.value.set(
+    Math.cos(theta),
+    -Math.sin(theta)
+  );
+  // rads += 0.001;
   renderer.render(scene, camera);
 }
 renderer.setAnimationLoop(animate);
