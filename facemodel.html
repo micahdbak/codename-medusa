@@ -10,12 +10,25 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: #000;
+            background: #b8b8b8;
+        }
+        #toggle-facial-features {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            z-index: 1000;
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
         }
     </style>
 </head>
 <body>
     <div id="face-model-container"></div>
+    <button id="toggle-facial-features" aria-pressed="true">Toggle Facial Features</button>
     <script type="module">
         import * as THREE from 'three';
         import { initFaceLandmark, updateFaceLandmarks } from './src/faceLandmark.js';
@@ -30,7 +43,7 @@
 
             const scene = new THREE.Scene();
             const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
-            camera.position.z = 2;
+            camera.position.z = 1;
 
             const renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(container.clientWidth, container.clientHeight);
@@ -54,6 +67,29 @@
             createEyes();
             createTongue();
             scene.add(mesh, leftEye, rightEye, leftPupil, rightPupil, tongue);
+             
+            const toggleBtn = document.getElementById('toggle-facial-features');
+            let featuresVisible = false;
+
+            // Set initial visibility
+            if (leftEye) leftEye.visible = featuresVisible;
+            if (rightEye) rightEye.visible = featuresVisible;
+            if (leftPupil) leftPupil.visible = featuresVisible;
+            if (rightPupil) rightPupil.visible = featuresVisible;
+            if (tongue) tongue.visible = featuresVisible;
+
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', () => {
+                    featuresVisible = !featuresVisible;
+                    if (leftEye) leftEye.visible = featuresVisible;
+                    if (rightEye) rightEye.visible = featuresVisible;
+                    if (leftPupil) leftPupil.visible = featuresVisible;
+                    if (rightPupil) rightPupil.visible = featuresVisible;
+                    if (tongue) tongue.visible = featuresVisible;
+
+                    toggleBtn.setAttribute('aria-pressed', String(featuresVisible));
+                });
+            }
 
             function animate() {
                 updateFaceLandmarks();

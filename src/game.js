@@ -86,8 +86,8 @@ async function main() {
     createEyes();
     createTongue();
     const faceModelGroup = new THREE.Group();
-    // faceModelGroup.add(mesh)
-    faceModelGroup.add(mesh, leftEye, rightEye, leftPupil, rightPupil, tongue);
+    faceModelGroup.add(mesh)
+    // faceModelGroup.add(mesh, leftEye, rightEye, leftPupil, rightPupil, tongue);
     scene.add(faceModelGroup);
 
     // --- Items ---
@@ -200,7 +200,7 @@ async function main() {
             if (distance3D(
                 { x: camera.position.x, y: camera.position.y, z: camera.position.z - 2 },
                 { x: item.position.x, y: item.position.y, z: item.position.z }
-            ) < 3.0) {
+            ) < 2.5) {
                 if (!isGameOver) {
                     isGameOver = true;
                     gameOverOverlay.style.display = 'flex';
