@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Face Mesh Renderer</title>
+    <style>
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script type="module">
+        import { initFaceLandmark, updateFaceLandmarks } from './src/faceLandmark.js';
+        import { initFaceMeshRenderer, renderFaceMesh } from './src/faceMesh.js';
+
+        async function main() {
+            const canvas = document.getElementById('canvas');
+            if (!canvas) {
+                console.error('Canvas element not found!');
+                return;
+            }
+
+            await initFaceLandmark();
+            initFaceMeshRenderer(canvas);
+
+            function animate() {
+                updateFaceLandmarks(); 
+                renderFaceMesh();
+                requestAnimationFrame(animate);
+            }
+            
+            animate();
+        }
+        main();
+    </script>
+</body>
+</html>

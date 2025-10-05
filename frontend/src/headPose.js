@@ -3,7 +3,6 @@ import { latestLandmarks } from './faceLandmark.js';
 export const smoothedHeadPose = { x: 0, y: 0, z: 0 };
 const rawHeadPose = { x: 0, y: 0, z: 0 };
 let initialEyeDistance = -1;
-let poseContainer;
 
 function calculateHeadPose() {
     if (!latestLandmarks || latestLandmarks.length === 0) return;
@@ -39,7 +38,7 @@ function smoothPose() {
     smoothedHeadPose.z += (rawHeadPose.z - smoothedHeadPose.z) * lerpFactor;
 }
 
-function displayPose() {
+export function displayPose(poseContainer) {
     if (!poseContainer) return;
     
     poseContainer.innerHTML = `
@@ -50,19 +49,7 @@ function displayPose() {
     `;
 }
 
-// Animation loop
-function update() {
+export function updateHeadPose() {
     calculateHeadPose();
     smoothPose();
-    displayPose();
-    requestAnimationFrame(update);
 }
-
-// Initialization
-function init() {
-    poseContainer = document.getElementById('head-pose-container');
-    if (!poseContainer) return;
-    update();
-}
-
-init();

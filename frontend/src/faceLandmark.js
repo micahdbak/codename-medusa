@@ -4,7 +4,7 @@ export let latestLandmarks = [];
 export let video;
 let faceLandmarker;
 
-function predictionLoop() {
+export function updateFaceLandmarks() {
     if (faceLandmarker && video.readyState >= 2) {
         const results = faceLandmarker.detectForVideo(video, performance.now());
         if (results.faceLandmarks && results.faceLandmarks.length > 0) {
@@ -13,15 +13,11 @@ function predictionLoop() {
     }
 }
 
-function update() {
-    predictionLoop();
-    requestAnimationFrame(update);
-}
-
-async function init() {
+export async function initFaceLandmark() {
     video = document.createElement('video');
     video.autoplay = true;
     video.playsInline = true;
+    // video.style.display = "none"; // Hide the video element if not needed for display
 
     const vision = await FilesetResolver.forVisionTasks(
         "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
@@ -42,11 +38,7 @@ async function init() {
     });
     video.srcObject = stream;
 
-    await new Promise((resolve) => {
+    return new Promise((resolve) => {
         video.addEventListener('loadeddata', resolve);
     });
-
-    update();
 }
-
-init();
