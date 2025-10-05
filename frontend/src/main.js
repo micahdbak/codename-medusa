@@ -22,19 +22,13 @@ directionalLight.castShadow = true; // enable shadows if needed
 scene.add(directionalLight);
 scene.add(directionalLight.target);
 
-const canvas = document.createElement('canvas');
-canvas.width = 64;
-canvas.height = 64;
-const context = canvas.getContext('2d');
-const size = 64;
-const halfSize = size / 2;
-context.fillStyle = '#f0f0f0';
-context.fillRect(0, 0, size, size);
-context.fillStyle = '#c0c0c0';
-context.fillRect(0, 0, halfSize, halfSize);
-context.fillRect(halfSize, halfSize, halfSize, halfSize);
+const video = document.createElement('video');
+video.src = '/walls4.mp4';
+video.loop = true;
+video.muted = true;
+video.play();
 
-const baseTexture = new THREE.CanvasTexture(canvas);
+const baseTexture = new THREE.VideoTexture(video);
 baseTexture.wrapS = THREE.RepeatWrapping;
 baseTexture.wrapT = THREE.RepeatWrapping;
 baseTexture.magFilter = THREE.NearestFilter;
@@ -183,8 +177,8 @@ function animate() {
 
     for (const item of items) {
       if (distance3D(
-        { x: camera.position.x, y: camera.position.y, z: camera.position.z },
-        { x: item.position.x, y: item.position.y, z: item.position.z }) < 5.0) {
+        { x: camera.position.x, y: camera.position.y, z: camera.position.z - 2 },
+        { x: item.position.x, y: item.position.y, z: item.position.z }) < 3.0) {
         window.location.href = "/game_over.html";
         return;
       }
