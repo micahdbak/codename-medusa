@@ -57,7 +57,7 @@ export function createFaceMesh() {
         specular: 0xffa080,
         shininess: 100,
         side: THREE.DoubleSide,
-        flatShading: true,
+        flatShading: false,
         transparent: false,
         opacity: 1,
     });

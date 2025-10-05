@@ -153,6 +153,18 @@ function animate() {
     if (keys.a) cameraBasePosition.x -= moveSpeed;
     if (keys.d) cameraBasePosition.x += moveSpeed;
 
+    if (cameraBasePosition.z < -50) {
+      cameraBasePosition.z = 0;
+
+      let dist = 30;
+      for (const item of items) {
+        item.position.x = Math.random() * 10 - 5;
+        item.position.y = Math.random() * 10 - 5;
+        item.position.z = -dist;
+        dist += 10;
+      }
+    }
+
     // Head pose movement (as an offset)
     const zOffset = smoothedHeadPose.z * -10;
     const targetX = smoothedHeadPose.x * -10;
@@ -183,9 +195,17 @@ function animate() {
     mesh.position.x = camera.position.x;
     mesh.position.y = camera.position.y;
     mesh.position.z = camera.position.z - 2;
-    directionalLight.position.x = camera.position.x;
-    directionalLight.position.y = camera.position.y;
-    directionalLight.position.z = camera.position.z + 2;
+
+    // Make the light follow the camera
+    directionalLight.position.copy(camera.position);
+
+    // Point the light in the same direction the camera is facing
+    const targetPosition = new THREE.Vector3();
+    camera.getWorldDirection(targetPosition);
+    targetPosition.add(camera.position);
+
+    directionalLight.target.position.copy(targetPosition);
+    directionalLight.target.updateMatrixWorld();
 
     renderer.render(scene, camera);
 }
