@@ -29,7 +29,7 @@ async function main() {
 
     // --- Tunnel ---
     const video = document.createElement('video');
-    video.src = '/walls4.mp4';
+    video.src = '/walls4.mp4'; // Make sure this video file is in your public folder
     video.loop = true;
     video.muted = true;
     video.play();
@@ -124,16 +124,32 @@ async function main() {
     });
 
     const poseContainer = document.getElementById('head-pose-container');
+    const gameOverOverlay = document.getElementById('game-over-overlay');
 
     // --- Game State ---
     const cameraBasePosition = new THREE.Vector3(0, 0, 0);
     const moveSpeed = 0.3;
+    let isGameOver = false;
 
     function distance3D(a, b) {
         const dx = a.x - b.x;
         const dy = a.y - b.y;
         const dz = a.z - b.z;
         return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    }
+
+    function restartGame() {
+        gameOverOverlay.style.display = 'none';
+        cameraBasePosition.set(0, 0, 0);
+        let dist = 30;
+        for (const item of items) {
+            item.position.x = Math.random() * 10 - 5;
+            item.position.y = Math.random() * 10 - 5;
+            item.position.z = -dist;
+            dist += 10;
+        }
+        isGameOver = false;
+        renderer.setAnimationLoop(animate);
     }
 
     // --- Animation Loop ---
@@ -184,12 +200,16 @@ async function main() {
                 { x: camera.position.x, y: camera.position.y, z: camera.position.z - 2 },
                 { x: item.position.x, y: item.position.y, z: item.position.z }
             ) < 3.0) {
-                // window.location.href = "/game_over.html"; // Make sure this file exists
-                console.log("Game Over");
-                renderer.setAnimationLoop(null); // Stop the game
+                if (!isGameOver) {
+                    isGameOver = true;
+                    gameOverOverlay.style.display = 'flex';
+                    renderer.setAnimationLoop(null);
+                    setTimeout(restartGame, 2000);
+                }
                 return;
             }
         }
+
 
         // Position face model in front of camera
         faceModelGroup.position.set(camera.position.x, camera.position.y, camera.position.z - 2);
