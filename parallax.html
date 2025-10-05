@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Parallax Illusion</title>
+    <style>
+      body {
+        padding: 0;
+        margin: 0;
+        overflow: hidden; /* Prevents scrollbars */
+      }
+      canvas {
+        display: block; /* Ensures the canvas fills the screen */
+      }
+      #fullscreen-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 10px;
+        background-color: rgba(0, 0, 0, 0.6);
+        color: white;
+        border: 1px solid white;
+        border-radius: 5px;
+        cursor: pointer;
+        z-index: 100;
+        font-family: 'Courier New', Courier, monospace;
+      }
+    </style>
+    <script type="module" crossorigin src="/assets/parallax-BftzIa5U.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/faceLandmark-BxCGo5NV.js">
+    <link rel="modulepreload" crossorigin href="/assets/three.module-0uv1M5cs.js">
+    <link rel="modulepreload" crossorigin href="/assets/headPose-6Lsff1ri.js">
+  </head>
+  <body>
+    <button id="fullscreen-button">Fullscreen</button>
+    <div style="display: none">
+      <div id="canvas-container">
+        <video id="video" autoplay></video>
+        <canvas id="canvas"></canvas>
+      </div>
+    </div>
+  </body>
+</html>

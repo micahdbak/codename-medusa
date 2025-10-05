@@ -10,14 +10,28 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: #000;
+            background: #b8b8b8;
+        }
+        #toggle-facial-features {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            z-index: 1000;
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
         }
     </style>
-  <script type="module" crossorigin src="/assets/facemodel-CQi4N9S3.js"></script>
+  <script type="module" crossorigin src="/assets/facemodel-DMSCRfLE.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/faceLandmark-BxCGo5NV.js">
-  <link rel="modulepreload" crossorigin href="/assets/faceModel-DY2VKlek.js">
+  <link rel="modulepreload" crossorigin href="/assets/three.module-0uv1M5cs.js">
+  <link rel="modulepreload" crossorigin href="/assets/faceModel-XAEEDs4G.js">
 </head>
 <body>
     <div id="face-model-container"></div>
+    <button id="toggle-facial-features" aria-pressed="true">Toggle Facial Features</button>
 </body>
 </html>
