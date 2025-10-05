@@ -6,7 +6,7 @@ let container;
 let renderer;
 let scene;
 let camera;
-let mesh;
+export let mesh;
 
 function setupScene() {
     scene = new THREE.Scene();
@@ -35,7 +35,7 @@ function setupLighting() {
     scene.add(back);
 }
 
-function createFaceMesh() {
+export function createFaceMesh() {
     const geometry = new THREE.BufferGeometry();
     const vertices = new Float32Array(478 * 3);
     geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
@@ -53,20 +53,20 @@ function createFaceMesh() {
     geometry.setIndex(indices);
 
     const material = new THREE.MeshPhongMaterial({ 
-        color: 0x808080,
-        specular: 0x404040,
-        shininess: 30,
+        color: 0xfed0a0,
+        specular: 0xffa080,
+        shininess: 100,
         side: THREE.DoubleSide,
-        flatShading: false,
-        transparent: true,
-        opacity: 0.95,
+        flatShading: true,
+        transparent: false,
+        opacity: 1,
     });
 
     mesh = new THREE.Mesh(geometry, material);
-    scene.add(mesh);
+    // scene.add(mesh);
 }
 
-function updateMesh() {
+export function updateMesh() {
     if (!mesh || !latestLandmarks || latestLandmarks.length === 0 || !video || !video.videoWidth) return;
 
     const positions = mesh.geometry.attributes.position.array;

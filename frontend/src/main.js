@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-import { smoothedHeadPose } from './facemesh.js';
+import { smoothedHeadPose } from './headPose.js';
+import { mesh, createFaceMesh, updateMesh } from './faceModelRenderer.js';
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x000000);
@@ -10,6 +11,16 @@ const renderer = new THREE.WebGLRenderer({ antialias: true });
 
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
+
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // color, intensity
+scene.add(ambientLight);
+
+// Directional light – acts like sunlight, casting shadows and highlights
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+directionalLight.position.set(0, 0, 0); // position in world space
+directionalLight.castShadow = true; // enable shadows if needed
+scene.add(directionalLight);
+scene.add(directionalLight.target);
 
 const canvas = document.createElement('canvas');
 canvas.width = 64;
@@ -70,6 +81,11 @@ rightWall.rotation.y = -Math.PI / 2;
 rightWall.position.x = tunnelWidth / 2;
 scene.add(rightWall);
 
+createFaceMesh();
+scene.add(mesh);
+
+const items = [];
+
 function createParallaxItem(x, y, z) {
     const itemGroup = new THREE.Group();
     const itemGeometry = new THREE.SphereGeometry(2, 32, 16);
@@ -78,11 +94,12 @@ function createParallaxItem(x, y, z) {
     item.position.set(x, y, z);
     itemGroup.add(item);
     scene.add(itemGroup);
+    items.push(item);
 }
 
 createParallaxItem(5, 5, -30);
-createParallaxItem(-2, 2, -10);
-createParallaxItem(7, 5, -20);
+createParallaxItem(-2, 2, -40);
+createParallaxItem(7, 5, -50);
 
 
 const keys = {
@@ -119,13 +136,19 @@ fullscreenButton.addEventListener('click', () => {
     }
 });
 
+function distance3D(a, b) {
+  const dx = a.x - b.x;
+  const dy = a.y - b.y;
+  const dz = a.z - b.z;
+  return Math.sqrt(dx * dx + dy * dy + dz * dz);
+}
 
 const cameraBasePosition = new THREE.Vector3(0, 0, 0);
 const moveSpeed = 0.3;
 
 function animate() {
     // Keyboard movement
-    if (keys.w) cameraBasePosition.z -= moveSpeed;
+    if (true) cameraBasePosition.z -= moveSpeed; // always move forward
     if (keys.s) cameraBasePosition.z += moveSpeed;
     if (keys.a) cameraBasePosition.x -= moveSpeed;
     if (keys.d) cameraBasePosition.x += moveSpeed;
@@ -145,6 +168,24 @@ function animate() {
 
     camera.rotation.y = smoothedHeadPose.x * -0.5;
     camera.rotation.x = smoothedHeadPose.y * -0.5;
+
+    for (const item of items) {
+      if (distance3D(
+        { x: camera.position.x, y: camera.position.y, z: camera.position.z },
+        { x: item.position.x, y: item.position.y, z: item.position.z }) < 5.0) {
+        window.location.href = "/game_over.html";
+        return;
+      }
+    }
+
+    updateMesh();
+
+    mesh.position.x = camera.position.x;
+    mesh.position.y = camera.position.y;
+    mesh.position.z = camera.position.z - 2;
+    directionalLight.position.x = camera.position.x;
+    directionalLight.position.y = camera.position.y;
+    directionalLight.position.z = camera.position.z + 2;
 
     renderer.render(scene, camera);
 }
