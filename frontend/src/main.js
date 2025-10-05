@@ -1,92 +1,152 @@
 import * as THREE from 'three';
-import fragShader from './shader.frag?raw';
-
 import { smoothedHeadPose } from './facemesh.js';
 
-// 10x10 map
-const map = [
-  1,1,1,1,1,1,1,1,1,1,
-  1,0,0,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,0,1,
-  1,0,0,1,0,0,1,0,0,1,
-  1,0,0,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,0,1,
-  1,1,1,1,1,1,1,1,1,1
-];
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x000000);
+scene.fog = new THREE.Fog(0x000000, 1, 100); 
 
-const mapW = 10;
-const mapH = 10;
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
 
-const data = new Uint8Array(4 * mapW * mapH);
-const size = mapW * mapH;
-
-const color = new THREE.Color(0xffffff);
-const r = Math.floor(color.r * 255);
-const g = Math.floor(color.g * 255);
-const b = Math.floor(color.b * 255);
-
-for (let i = 0; i < size; i++) {
-	const stride = i * 4;
-	
-  if (map[i] == 1) {
-    data[stride] = r;
-    data[stride + 1] = g;
-    data[stride + 2] = b;
-  } else {
-    data[stride] = 0;
-    data[stride + 1] = 0;
-    data[stride + 2] = 0;
-  }
-	data[stride + 3] = 255;
-}
-
-const mapTexture = new THREE.DataTexture(data, mapW, mapH);
-mapTexture.needsUpdate = true;
-
-const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-const scene = new THREE.Scene();
-const camera = new THREE.Camera();
-camera.position.z = 1;
+const canvas = document.createElement('canvas');
+canvas.width = 64;
+canvas.height = 64;
+const context = canvas.getContext('2d');
+const size = 64;
+const halfSize = size / 2;
+context.fillStyle = '#f0f0f0';
+context.fillRect(0, 0, size, size);
+context.fillStyle = '#c0c0c0';
+context.fillRect(0, 0, halfSize, halfSize);
+context.fillRect(halfSize, halfSize, halfSize, halfSize);
 
-const geometry = new THREE.PlaneGeometry(2, 2);
-const material = new THREE.ShaderMaterial({
-  uniforms: {
-    uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-    uCamPos: { value: new THREE.Vector2(5.0, 5.0) },
-    uCamDir: { value: new THREE.Vector2(-0.5, -1.0) },
-    uMap: { value: mapTexture },
-    uMapSize: { value: new THREE.Vector2(mapW, mapH) }
-  },
-  fragmentShader: fragShader
+const baseTexture = new THREE.CanvasTexture(canvas);
+baseTexture.wrapS = THREE.RepeatWrapping;
+baseTexture.wrapT = THREE.RepeatWrapping;
+baseTexture.magFilter = THREE.NearestFilter;
+
+const tunnelWidth = 20;
+const tunnelLength = 200;
+
+const floorCeilingGeo = new THREE.PlaneGeometry(tunnelWidth, tunnelLength);
+const wallGeo = new THREE.PlaneGeometry(tunnelLength, tunnelWidth);
+
+const floorTexture = baseTexture.clone();
+floorTexture.needsUpdate = true;
+floorTexture.repeat.set(4, 20);
+const floorMaterial = new THREE.MeshBasicMaterial({ color: 0x404040, map: floorTexture });
+const floor = new THREE.Mesh(floorCeilingGeo, floorMaterial);
+floor.rotation.x = -Math.PI / 2;
+floor.position.y = -tunnelWidth / 2;
+scene.add(floor);
+
+const ceilingTexture = baseTexture.clone();
+ceilingTexture.needsUpdate = true;
+ceilingTexture.repeat.set(4, 20);
+const ceilingMaterial = new THREE.MeshBasicMaterial({ color: 0x404040, map: ceilingTexture });
+const ceiling = new THREE.Mesh(floorCeilingGeo, ceilingMaterial);
+ceiling.rotation.x = Math.PI / 2;
+ceiling.position.y = tunnelWidth / 2;
+scene.add(ceiling);
+
+const leftWallTexture = baseTexture.clone();
+leftWallTexture.needsUpdate = true;
+leftWallTexture.repeat.set(20, 4);
+const leftWallMaterial = new THREE.MeshBasicMaterial({ color: 0x404040, map: leftWallTexture });
+const leftWall = new THREE.Mesh(wallGeo, leftWallMaterial);
+leftWall.rotation.y = Math.PI / 2;
+leftWall.position.x = -tunnelWidth / 2;
+scene.add(leftWall);
+
+const rightWallTexture = baseTexture.clone();
+rightWallTexture.needsUpdate = true;
+rightWallTexture.repeat.set(20, 4);
+const rightWallMaterial = new THREE.MeshBasicMaterial({ color: 0x404040, map: rightWallTexture });
+const rightWall = new THREE.Mesh(wallGeo, rightWallMaterial);
+rightWall.rotation.y = -Math.PI / 2;
+rightWall.position.x = tunnelWidth / 2;
+scene.add(rightWall);
+
+function createParallaxItem(x, y, z) {
+    const itemGroup = new THREE.Group();
+    const itemGeometry = new THREE.SphereGeometry(2, 32, 16);
+    const itemMaterial = new THREE.MeshBasicMaterial({ color: 0x808080 });
+    const item = new THREE.Mesh(itemGeometry, itemMaterial);
+    item.position.set(x, y, z);
+    itemGroup.add(item);
+    scene.add(itemGroup);
+}
+
+createParallaxItem(5, 5, -30);
+createParallaxItem(-2, 2, -10);
+createParallaxItem(7, 5, -20);
+
+
+const keys = {
+    w: false,
+    a: false,
+    s: false,
+    d: false,
+};
+
+window.addEventListener('keydown', (e) => {
+    if (e.key.toLowerCase() in keys) {
+        keys[e.key.toLowerCase()] = true;
+    }
 });
 
-const quad = new THREE.Mesh(geometry, material);
-scene.add(quad);
+window.addEventListener('keyup', (e) => {
+    if (e.key.toLowerCase() in keys) {
+        keys[e.key.toLowerCase()] = false;
+    }
+});
 
-var rads = 0;
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
 
-// Animate
+const fullscreenButton = document.getElementById('fullscreen-button');
+fullscreenButton.addEventListener('click', () => {
+    if (document.fullscreenElement) {
+        document.exitFullscreen();
+    } else {
+        document.documentElement.requestFullscreen();
+    }
+});
+
+
+const cameraBasePosition = new THREE.Vector3(0, 0, 0);
+const moveSpeed = 0.3;
+
 function animate() {
-  material.uniforms.uResolution.value.set(
-    window.innerWidth,
-    window.innerHeight
-  );
-  let theta = rads - smoothedHeadPose.x;
-  material.uniforms.uCamPos.value.set(
-    5.0 + (Math.cos(theta) * smoothedHeadPose.z),
-    5.0 - (Math.sin(theta) * smoothedHeadPose.z)
-  );
-  material.uniforms.uCamDir.value.set(
-    Math.cos(theta),
-    -Math.sin(theta)
-  );
-  // rads += 0.001;
-  renderer.render(scene, camera);
+    // Keyboard movement
+    if (keys.w) cameraBasePosition.z -= moveSpeed;
+    if (keys.s) cameraBasePosition.z += moveSpeed;
+    if (keys.a) cameraBasePosition.x -= moveSpeed;
+    if (keys.d) cameraBasePosition.x += moveSpeed;
+
+    // Head pose movement (as an offset)
+    const zOffset = smoothedHeadPose.z * -10;
+    const targetX = smoothedHeadPose.x * -10;
+    const targetY = smoothedHeadPose.y * 10;
+
+    const halfWidth = tunnelWidth / 2;
+    const margin = 1;
+
+    // Combine base position with head pose offset
+    camera.position.x = THREE.MathUtils.clamp(cameraBasePosition.x + targetX, -halfWidth + margin, halfWidth - margin);
+    camera.position.y = THREE.MathUtils.clamp(cameraBasePosition.y + targetY, -halfWidth + margin, halfWidth - margin);
+    camera.position.z = cameraBasePosition.z + zOffset;
+
+    camera.rotation.y = smoothedHeadPose.x * -0.5;
+    camera.rotation.x = smoothedHeadPose.y * -0.5;
+
+    renderer.render(scene, camera);
 }
+
 renderer.setAnimationLoop(animate);

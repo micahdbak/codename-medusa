@@ -22,9 +22,23 @@
         border-radius: 5px;
         z-index: 100;
       }
+      #fullscreen-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 10px;
+        background-color: rgba(0, 0, 0, 0.6);
+        color: white;
+        border: 1px solid white;
+        border-radius: 5px;
+        cursor: pointer;
+        z-index: 100;
+        font-family: 'Courier New', Courier, monospace;
+      }
     </style>
   </head>
   <body>
+    <button id="fullscreen-button">Fullscreen</button>
     <script type="module" src="/src/main.js"></script>
     <script type="module" src="/src/facemesh.js"></script>
     <div id="pose-data-container"></div>
