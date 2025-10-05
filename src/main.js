@@ -86,6 +86,7 @@ async function main() {
     createEyes();
     createTongue();
     const faceModelGroup = new THREE.Group();
+    // faceModelGroup.add(mesh)
     faceModelGroup.add(mesh, leftEye, rightEye, leftPupil, rightPupil, tongue);
     scene.add(faceModelGroup);
 
